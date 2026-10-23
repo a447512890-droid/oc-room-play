@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+<rect width="220" height="220" fill="#fbfdff"/>
+<defs><g id="feather" fill="#e6f3fd" stroke="#a4cbe5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M-15 15C-22 2-6-19 12-21C27-23 23-4 12 6C4 14-7 19-15 15Z"/>
+<path d="M-20 22L13-12M-9 10L-10 1M1 0L9 0" fill="none"/>
+</g></defs>
+<use href="#feather" transform="translate(48 52) scale(.9)"/>
+<use href="#feather" transform="translate(158 162) scale(-.9 .9)"/>
+</svg>
