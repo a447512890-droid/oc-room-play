@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 		<title>菠萝的小房间</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -103,6 +105,7 @@ body {
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+<link rel="manifest" href="index.manifest.json">
 
 	</head>
 	<body>
@@ -136,9 +139,20 @@ function fitGameCanvas() {
 }
 fitGameCanvas();
 new ResizeObserver(fitGameCanvas).observe(gameCanvas);
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":26371992,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":26371992,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
+if ('serviceWorker' in navigator && GODOT_CONFIG.serviceWorker) {
+ const notice = document.createElement('div');
+ notice.textContent = '正在准备离线资源，首次请保持联网…';
+ notice.style.cssText = 'position:fixed;bottom:env(safe-area-inset-bottom,0px);left:0;right:0;background:#edf7ff;color:#42627a;padding:8px;text-align:center;font:14px sans-serif;z-index:100;pointer-events:none';
+ document.body.appendChild(notice);
+ navigator.serviceWorker.register(GODOT_CONFIG.serviceWorker).then(() => navigator.serviceWorker.ready).then(() => {
+  notice.textContent = '离线资源已就绪 · 可添加到主屏幕';
+  setTimeout(() => notice.remove(), 12000);
+ }).catch(() => { notice.textContent = '离线保存未完成，请保持联网后重新打开'; });
+}
+
 
 (function () {
 	const statusOverlay = document.getElementById('status');
