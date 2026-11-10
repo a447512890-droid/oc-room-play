@@ -139,19 +139,12 @@ function fitGameCanvas() {
 }
 fitGameCanvas();
 new ResizeObserver(fitGameCanvas).observe(gameCanvas);
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12027616,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12643508,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
-if (new URLSearchParams(location.search).has('online')) GODOT_CONFIG.serviceWorker = '';
+if (['localhost','127.0.0.1'].includes(location.hostname) || new URLSearchParams(location.search).has('online')) GODOT_CONFIG.serviceWorker = '';
 if ('serviceWorker' in navigator && GODOT_CONFIG.serviceWorker) {
- const notice = document.createElement('div');
- notice.textContent = '正在准备离线资源，首次请保持联网…';
- notice.style.cssText = 'position:fixed;bottom:env(safe-area-inset-bottom,0px);left:0;right:0;background:#edf7ff;color:#42627a;padding:8px;text-align:center;font:14px sans-serif;z-index:100;pointer-events:none';
- document.body.appendChild(notice);
- navigator.serviceWorker.register(GODOT_CONFIG.serviceWorker).then(() => navigator.serviceWorker.ready).then(() => {
-  notice.textContent = '离线缓存已启用 · 首次仍需完成游戏下载';
-  setTimeout(() => notice.remove(), 12000);
- }).catch(() => { notice.textContent = '离线保存未完成，请保持联网后重新打开'; });
+ navigator.serviceWorker.register(GODOT_CONFIG.serviceWorker).catch(error => console.warn('Offline cache registration failed', error));
 }
 
 
