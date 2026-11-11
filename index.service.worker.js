@@ -1,10 +1,27 @@
+
+const ASSET_HASHES = {"index.wasm": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0", "index.pck": "ed0655d3ca572a0ed8abb4dc70d48a90dcf304d67921c2d56a062c857e5a96e8"};
+self.addEventListener('fetch', event => {
+ const url=new URL(event.request.url);
+ const name=url.pathname.split('/').pop();
+ if(url.origin!==self.location.origin || !ASSET_HASHES[name])return;
+ event.stopImmediatePropagation();
+ event.respondWith((async()=>{
+  const cache=await caches.open('oc-room-large-assets-v1');
+  const key=new URL(name+'?content='+ASSET_HASHES[name],self.registration.scope).href;
+  const cached=await cache.match(key);
+  if(cached)return ensureCrossOriginIsolationHeaders(cached);
+  const response=await fetch(event.request);
+  if(response.ok){try{await cache.put(key,response.clone());}catch(error){console.warn("Asset cache unavailable",error);}}
+  return ensureCrossOriginIsolationHeaders(response);
+ })());
+});
 // This service worker is required to expose an exported Godot project as a
 // Progressive Web App. It provides an offline fallback page telling the user
 // that they need an Internet connection to run the project if desired.
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1794372938|3166437';
+const CACHE_VERSION = '1794378390|2567935';
 /** @type {string} */
 const CACHE_PREFIX = '菠萝的小房间-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
@@ -107,7 +124,7 @@ self.addEventListener(
 				if (isNavigate) {
 					// Check if we have full cache during HTML page request.
 					/** @type {Response[]} */
-					const fullCache = await Promise.all(FULL_CACHE.map((name) => cache.match(name)));
+					const fullCache = await Promise.all(FULL_CACHE.map(async(name) => ASSET_HASHES[name] ? (await caches.open('oc-room-large-assets-v1')).match(new URL(name+'?content='+ASSET_HASHES[name],self.registration.scope).href) : cache.match(name)));
 					const missing = fullCache.some((v) => v === undefined);
 					if (missing) {
 						try {

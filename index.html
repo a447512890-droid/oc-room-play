@@ -123,6 +123,21 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
+        <button id="cache-repair" style="position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:10000;padding:12px 18px;border:1px solid #91bddb;border-radius:22px;background:#f5fbff;color:#42627a;font:16px sans-serif;cursor:pointer">修复缓存</button>
+        <script>
+        document.getElementById('cache-repair').onclick=async function(){
+         this.disabled=true;this.textContent='正在修复…';
+         try {
+          if ('serviceWorker' in navigator) {
+           const base=new URL('./',location.href).href;
+           const list=await navigator.serviceWorker.getRegistrations();
+           for(const reg of list)if(reg.scope===base)await reg.unregister();
+          }
+          // Preserve Cache Storage and IndexedDB: do not delete valid assets or saves.
+          location.replace('./index.html?repair='+Date.now());
+         }catch(error){this.disabled=false;this.textContent='重试修复缓存';}
+        };
+        </script>
 		<script src="index.js"></script>
 		<script>
 // Keep the customer-facing tab title stable while the engine switches scenes.
@@ -244,6 +259,7 @@ if ('serviceWorker' in navigator && GODOT_CONFIG.serviceWorker) {
 			},
 		}).then(() => {
 			setStatusMode('hidden');
+            document.getElementById('cache-repair').hidden=true;
 		}, displayFailureNotice);
 	}
 }());
